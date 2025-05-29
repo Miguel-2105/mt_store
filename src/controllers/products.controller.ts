@@ -9,52 +9,45 @@ import {
   Query,
   HttpStatus,
   HttpCode,
+  //ParseIntPipe,
 } from '@nestjs/common';
-
+import { ProductsService } from './../services/products.service';
+import { ParseIntPipe } from '../common/parse-int/parse-int.pipe';
 @Controller('products')
 export class ProductsController {
+  constructor(private productService: ProductsService) {}
   @Get()
   getProducts(
     @Query('limit') limit: number = 20,
     @Query('offset') offset: number = 12,
     @Query('brand') brand: string,
   ) {
-    return `limit ${limit} offset ${offset} brand ${brand}`;
+    return this.productService.findAll();
   }
 
   @Get('/filter')
   getProductFilter() {
-    return 'i am filter';
+    return 'aaa';
   }
 
   @Get(':productId')
   @HttpCode(HttpStatus.ACCEPTED)
-  getProduct(@Param('productId') productId: string) {
-    return {
-      productId,
-    };
+  getProduct(@Param('productId', ParseIntPipe) productId: number) {
+    return this.productService.findOne(productId);
   }
 
   @Post()
   create(@Body() payload: any) {
-    return {
-      message: 'accion de crear',
-      payload,
-    };
+    return this.productService.create(payload);
   }
 
   @Put(':id')
   update(@Param('id') id: number, @Body() payload: any) {
-    return {
-      id,
-      payload,
-    };
+    return this.productService.update(+id, payload);
   }
 
   @Delete(':id')
   delete(@Param('id') id: number) {
-    return {
-      id,
-    };
+    return this.productService.delete(id);
   }
 }
